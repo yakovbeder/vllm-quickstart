@@ -86,7 +86,7 @@ Render the semicolon-delimited API tokens
 {{- define "openwebui.openai-api-keys" -}}
 {{- $tokens := list }}
 {{- range $endpoint := .Values.configuration.vllmEndpoints }}
-{{- $tokens = append $tokens $endpoint.token }}
+{{- $tokens = append $tokens (default "" $endpoint.token) }}
 {{- end }}
 {{- $tokens | join ";" }}
 {{- end }}
