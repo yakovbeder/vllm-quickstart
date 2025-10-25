@@ -14,10 +14,8 @@ spec:
       {{- include "vllm.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- if or .Values.podAnnotations .Values.monitoring.enabled }}
       annotations:
         {{- include "vllm.podAnnotations" . | nindent 8 }}
-      {{- end }}
       labels:
         {{- include "vllm.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}

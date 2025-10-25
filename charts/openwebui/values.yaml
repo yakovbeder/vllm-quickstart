@@ -16,8 +16,9 @@ configuration:
     ENABLE_SIGNUP: "false"
     WEBUI_AUTH: "false"
   extraArgs: []
-  vllmEndpoint: http://vllm.example.svc:8000/v1
-  vllmToken: ""
+  vllmEndpoints:
+    - endpoint: http://vllm.example.svc:8000/v1
+      token: ""
   data:
     type: pvc # type can be one of pvc or emptyDir
     size: 5Gi
@@ -55,6 +56,8 @@ securityContext:
     - ALL
   readOnlyRootFilesystem: true
   runAsNonRoot: true
+
+injectServiceCA: false
 
 service:
   type: ClusterIP

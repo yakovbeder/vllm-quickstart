@@ -60,3 +60,33 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Ensure that config changes roll the deployment
+*/}}
+{{- define "openwebui.config-annotations" -}}
+checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+{{- end }}
+
+{{/*
+Template the semicolon-delimited base urls
+*/}}
+{{- define "openwebui.openai-api-base-urls" -}}
+{{- $endpoints := list }}
+{{- range $endpoint := .Values.configuration.vllmEndpoints }}
+{{- $endpoints = append $endpoints $endpoint.endpoint }}
+{{- end }}
+{{- $endpoints | join ";" }}
+{{- end }}
+
+{{/*
+Render the semicolon-delimited API tokens
+*/}}
+{{- define "openwebui.openai-api-keys" -}}
+{{- $tokens := list }}
+{{- range $endpoint := .Values.configuration.vllmEndpoints }}
+{{- $tokens = append $tokens $endpoint.token }}
+{{- end }}
+{{- $tokens | join ";" }}
+{{- end }}

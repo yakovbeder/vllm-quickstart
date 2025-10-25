@@ -46,9 +46,11 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 Pod annotations
 */}}
 {{- define "vllm.podAnnotations" -}}
-{{- if .Values.monitoring.enabled -}}
+checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+{{- if .Values.monitoring.enabled }}
 prometheus.io/path: /metrics
-prometheus.io/port: "8000"
+prometheus.io/port: {{ .Values.service.port | quote }}
 {{- range $k, $v := .Values.podAnnotations }}
 {{- if and (ne "prometheus.io/path" $k) (ne "promethius.io/port" $k) }}
 {{ $k }}: {{ quote $v }}

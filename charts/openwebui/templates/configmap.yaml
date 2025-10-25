@@ -8,11 +8,10 @@ metadata:
 data:
   ENABLE_OLLAMA_API: "false"
   ENABLE_OPENAI_API: "true"
-  OPENAI_API_BASE_URL: {{ tpl .Values.configuration.vllmEndpoint . | quote }}
+  ENABLE_VERSION_UPDATE_CHECK: "false"
+  OPENAI_API_BASE_URLS: {{ tpl (include "openwebui.openai-api-base-urls" .) . | quote }}
   {{- range $k, $v := .Values.configuration.env }}
-  {{- if and (ne $k "OPENAI_API_KEY") (and (ne $k "ENABLE_OLLAMA_API") (and (ne $k "ENABLE_OPENAI_API") (ne $k "OPENAPI_BASE_URL"))) }}
   {{ $k }}: {{ quote $v }}
-  {{- end }}
   {{- end }}
 {{- if .Values.route.oauth.enabled }}
 ---
@@ -22,4 +21,13 @@ metadata:
   name: {{ include "openwebui.fullname" . }}-ocp-injected-certs
   labels:
     config.openshift.io/inject-trusted-cabundle: "true"
+{{- end }}
+{{- if .Values.injectServiceCA }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "openwebui.fullname" . }}-ocp-service-ca
+  annotations:
+    service.beta.openshift.io/inject-cabundle: "true"
 {{- end }}

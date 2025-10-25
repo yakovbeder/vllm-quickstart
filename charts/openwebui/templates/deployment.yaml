@@ -14,10 +14,11 @@ spec:
       {{- include "openwebui.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        {{- include "openwebui.config-annotations" . | nindent 8 }}
+        {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       labels:
         {{- include "openwebui.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
@@ -31,6 +32,25 @@ spec:
       serviceAccountName: {{ include "openwebui.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.injectServiceCA }}
+      initContainers:
+        - name: ca-bundle-packer
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command:
+            - /bin/bash
+          args:
+            - -c
+            - |-
+              set -x
+              find /etc/ssl/certs -type f -o -type l -exec cp -P {} /etc/ssl/new-root/ \;
+              update-ca-certificates --etccertsdir /etc/ssl/new-root
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - name: service-ca
+              mountPath: /usr/local/share/ca-certificates
+            - name: new-ca-root
+              mountPath: /etc/ssl/new-root
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -65,6 +85,10 @@ spec:
               mountPath: /app/backend/data
             - name: tmp
               mountPath: /tmp
+            {{- if .Values.injectServiceCA }}
+            - mountPath: /etc/ssl/certs
+              name: new-ca-root
+            {{- end }}
         {{- if .Values.route.oauth.enabled }}
         - name: oauth-proxy
           image: image-registry.openshift-image-registry.svc:5000/openshift/oauth-proxy:v4.4
@@ -110,6 +134,13 @@ spec:
           {{- end }}
         - name: tmp
           emptyDir: {}
+        {{- if .Values.injectServiceCA }}
+        - name: service-ca
+          configMap:
+            name: {{ include "openwebui.fullname" . }}-ocp-service-ca
+        - name: new-ca-root
+          emptyDir: {}
+        {{- end }}
         {{- if .Values.route.oauth.enabled }}
         - name: proxy-svc-tls
           secret:

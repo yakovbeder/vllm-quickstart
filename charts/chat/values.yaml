@@ -4,6 +4,7 @@ vllm:
 
 openwebui:
   enabled: true
-  vllmPort: 8000
   configuration:
-    vllmEndpoint: 'http://{{ include "vllm.fullname" . }}.{{ .Release.Namespace }}.svc:{{ default .Values.vllmPort "8000" }}/v1'
+    vllmEndpoints:
+      - endpoint: 'http://{{ if eq .Release.Name "vllm" }}{{ .Release.Name }}{{ else }}{{ printf "%s-%s" .Release.Name "vllm" }}{{ end }}.{{ .Release.Namespace }}.svc:8000/v1'
+        token: ""
