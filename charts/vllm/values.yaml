@@ -78,15 +78,15 @@ route:
     insecureEdgeTerminationPolicy: Redirect
   subdomain: ""
 
-resources:
-  limits:
-    cpu: 4
-    memory: 16Gi
-    nvidia.com/gpu: 1
-  requests:
-    cpu: 2
-    memory: 8Gi
-    nvidia.com/gpu: 1
+resources: {}
+#   limits:
+#     cpu: 4
+#     memory: 16Gi
+#     nvidia.com/gpu: 1
+#   requests:
+#     cpu: 2
+#     memory: 8Gi
+#     nvidia.com/gpu: 1
 
 livenessProbe:
   httpGet:
@@ -112,9 +112,9 @@ startupProbe:
 
 nodeSelector: {}
 
-tolerations:
-  - key: nvidia.com/gpu
-    effect: NoSchedule
-    operator: Exists
+tolerations: []
+#   - key: nvidia.com/gpu
+#     effect: NoSchedule
+#     operator: Exists
 
 affinity: {}
