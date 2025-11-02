@@ -12,5 +12,5 @@ spec:
     scheme: http
   selector:
     matchLabels:
-      {{- include "vllm.selectorLabels" . | nindent 4 }}
+      {{- include "vllm.selectorLabels" . | nindent 6 }}
 {{- end }}
