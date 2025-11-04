@@ -4,6 +4,10 @@ metadata:
   name: {{ include "vllm.fullname" . }}
   labels:
     {{- include "vllm.labels" . | nindent 4 }}
+  {{- if .Values.oauth.enabled }}
+  annotations:
+    service.beta.openshift.io/serving-cert-secret-name: {{ include "vllm.fullname" . }}-proxy-svc-tls
+  {{- end }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -11,5 +15,11 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+    {{- if .Values.oauth.enabled }}
+    - port: 8443
+      targetPort: oauth
+      protocol: TCP
+      name: oauth
+    {{- end }}
   selector:
     {{- include "vllm.selectorLabels" . | nindent 4 }}
