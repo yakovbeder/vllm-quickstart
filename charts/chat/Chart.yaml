@@ -3,12 +3,12 @@ apiVersion: v2
 name: chat
 description: A Helm chart to deploy Red Hat AI Inference Server and Open WebUI to interact with a model
 type: application
-version: 0.2.0
+version: 0.2.1
 appVersion: 0.1.0
 
 dependencies:
 - name: vllm
-  version: 0.5.0
+  version: 0.5.1
   repository: file://../vllm
   condition: vllm.enabled
 - name: openwebui

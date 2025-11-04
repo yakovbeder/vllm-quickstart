@@ -8,6 +8,7 @@ metadata:
 data:
   HF_HOME: {{ .Values.configuration.modelStorage.rootDir }}
   HOME: {{ .Values.configuration.modelStorage.rootDir }}
+  VLLM_PORT: {{ .Values.service.port | quote }}
   {{- if .Values.configuration.hfModelDownload.enabled }}
   HF_HUB_OFFLINE: "0"
   {{- else }}

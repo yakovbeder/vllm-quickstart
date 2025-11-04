@@ -101,6 +101,8 @@ spec:
             - name: model-storage
         {{- if and (eq .Values.configuration.modelStorage.type "image") (eq .Values.configuration.modelStorage.image.type "modelCar") }}
               mountPath: {{ .Values.configuration.modelStorage.rootDir }}/.modelcar
+            - name: tmp-home
+              mountPath: {{ .Values.configuration.modelStorage.rootDir }}
         - name: modelcar
           image: {{ .Values.configuration.modelStorage.image.reference }}
           command:
@@ -139,6 +141,8 @@ spec:
           configMap:
             name:  {{ include "vllm.fullname" . }}-modelcar-mount
             defaultMode: 493
+        - name: tmp-home
+          emptyDir: {}
         {{- end }}
         {{- end }}
         - name: shm
