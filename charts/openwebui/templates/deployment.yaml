@@ -89,9 +89,9 @@ spec:
             - mountPath: /etc/ssl/certs
               name: new-ca-root
             {{- end }}
-        {{- if .Values.route.oauth.enabled }}
+        {{- if .Values.oauth.enabled }}
         - name: oauth-proxy
-          image: image-registry.openshift-image-registry.svc:5000/openshift/oauth-proxy:v4.4
+          image: {{ .Values.oauth.image.registry }}/{{ .Values.oauth.image.repo }}:{{ .Values.oauth.image.tag }}
           args:
             - --provider=openshift
             - --pass-basic-auth=false
@@ -107,7 +107,7 @@ spec:
             - --openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
             - --openshift-ca=/etc/ocp-injected-certs/ca-bundle.crt
             - >
-              --openshift-sar={{ tpl .Values.route.oauth.sarTemplate . }}
+              --openshift-sar={{ tpl .Values.oauth.sarTemplate . }}
           ports:
             - containerPort: 8443
               name: oauth
@@ -141,7 +141,7 @@ spec:
         - name: new-ca-root
           emptyDir: {}
         {{- end }}
-        {{- if .Values.route.oauth.enabled }}
+        {{- if .Values.oauth.enabled }}
         - name: proxy-svc-tls
           secret:
             secretName: {{ include "openwebui.fullname" . }}-proxy-svc-tls

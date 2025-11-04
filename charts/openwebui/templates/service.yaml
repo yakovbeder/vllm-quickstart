@@ -4,7 +4,7 @@ metadata:
   name: {{ include "openwebui.fullname" . }}
   labels:
     {{- include "openwebui.labels" . | nindent 4 }}
-  {{- if .Values.route.oauth.enabled }}
+  {{- if .Values.oauth.enabled }}
   annotations:
     service.beta.openshift.io/serving-cert-secret-name: {{ include "openwebui.fullname" . }}-proxy-svc-tls
   {{- end }}
@@ -15,7 +15,7 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
-    {{- if .Values.route.oauth.enabled }}
+    {{- if .Values.oauth.enabled }}
     - port: 8443
       targetPort: oauth
       protocol: TCP

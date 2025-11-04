@@ -19,15 +19,15 @@ spec:
     name: {{ $fullName }}
     weight: 100
   port:
-    {{- if .Values.route.oauth.enabled }}
+    {{- if .Values.oauth.enabled }}
     targetPort: oauth
     {{- else }}
     targetPort: http
     {{- end }}
-  {{- if or .Values.route.tls.enabled .Values.route.oauth.enabled }}
+  {{- if or .Values.route.tls.enabled .Values.oauth.enabled }}
   tls:
     insecureEdgeTerminationPolicy: {{ .Values.route.tls.insecureEdgeTerminationPolicy }}
-    {{- if .Values.route.oauth.enabled }}
+    {{- if .Values.oauth.enabled }}
     {{- if .Values.route.tls.enabled }}
     termination: reencrypt
     {{- else }}

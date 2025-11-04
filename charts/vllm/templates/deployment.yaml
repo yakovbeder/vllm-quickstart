@@ -122,6 +122,36 @@ spec:
         {{- else }} {{/* this is the model-storage mount for the main container when not using an image */}}
               mountPath: {{ .Values.configuration.modelStorage.rootDir }}
         {{- end }}
+        {{- if .Values.oauth.enabled }}
+        - name: oauth-proxy
+          image: {{ .Values.oauth.image.registry }}/{{ .Values.oauth.image.repo }}:{{ .Values.oauth.image.tag }}
+          args:
+            - --provider=openshift
+            - --pass-basic-auth=false
+            - --https-address=:8443
+            - --http-address=
+            - --email-domain=*
+            - --upstream=http://localhost:{{ .Values.service.port }}
+            - --openshift-service-account={{ include "vllm.serviceAccountName" . }}
+            - --tls-key=/etc/tls/private/tls.key
+            - --tls-cert=/etc/tls/private/tls.crt
+            - --cookie-secret-file=/etc/proxy/secrets/session_secret
+            - --openshift-ca=/etc/pki/tls/cert.pem
+            - --openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            - --openshift-ca=/etc/ocp-injected-certs/ca-bundle.crt
+            - >
+              --openshift-sar={{ tpl .Values.oauth.sarTemplate . }}
+          ports:
+            - containerPort: 8443
+              name: oauth
+          volumeMounts:
+            - mountPath: /etc/tls/private
+              name: proxy-svc-tls
+            - mountPath: /etc/proxy/secrets
+              name: proxy-session
+            - mountPath: /etc/ocp-injected-certs
+              name: proxy-ca
+        {{- end }}
       volumes:
         - name: model-storage
         {{- if eq .Values.configuration.modelStorage.type "pvc" }}
@@ -144,6 +174,17 @@ spec:
         - name: tmp-home
           emptyDir: {}
         {{- end }}
+        {{- end }}
+        {{- if .Values.oauth.enabled }}
+        - name: proxy-svc-tls
+          secret:
+            secretName: {{ include "vllm.fullname" . }}-proxy-svc-tls
+        - name: proxy-session
+          secret:
+            secretName: {{ include "vllm.fullname" . }}-proxy-session
+        - name: proxy-ca
+          configMap:
+            name: {{ include "vllm.fullname" . }}-ocp-injected-certs
         {{- end }}
         - name: shm
           emptyDir:
