@@ -13,7 +13,7 @@ data:
   {{- range $k, $v := .Values.configuration.env }}
   {{ $k }}: {{ quote $v }}
   {{- end }}
-{{- if .Values.route.oauth.enabled }}
+{{- if .Values.oauth.enabled }}
 ---
 apiVersion: v1
 kind: ConfigMap
