@@ -1,0 +1,24 @@
+configuration:
+  modelReference: granite-3-1-8b-instruct
+  extraArgs:
+  - "--tensor-parallel-size=4"
+#  - "--max-model-len=131072"
+  modelStorage:
+    type: image
+    image:
+      type: modelCar
+      reference: registry.redhat.io/rhelai1/modelcar-granite-3-1-8b-instruct:1.5
+resources:
+  limits:
+    cpu: 8
+    memory: 32Gi
+    nvidia.com/gpu: 4
+  requests:
+    cpu: 4
+    memory: 24Gi
+    nvidia.com/gpu: 4
+
+tolerations: # you only need this if your GPU node is tainted)
+  - key: nvidia.com/gpu
+    effect: NoSchedule
+    operator: Exists
