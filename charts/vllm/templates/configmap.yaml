@@ -18,12 +18,3 @@ data:
   {{ $k }}: {{ quote $v }}
   {{- end }}
   {{- end }}
-{{- if .Values.oauth.enabled }}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "vllm.fullname" . }}-ocp-injected-certs
-  labels:
-    config.openshift.io/inject-trusted-cabundle: "true"
-{{- end }}
